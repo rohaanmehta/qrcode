@@ -1,0 +1,1324 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #2a9df4;
+      --text: #202a37;
+      --muted: #7a818b;
+      --border: #e7e9ed;
+      --green: #1ebc65;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      font-family: "Poppins", Arial, sans-serif;
+      color: var(--text);
+      background: #f8f9fb;
+    }
+
+    .topbar {
+      height: 96px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 56px;
+      background: #fff;
+      border-bottom: 1px solid #edf0f3;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 38px;
+      line-height: 1;
+      color: #3e3f42;
+      letter-spacing: -2px;
+    }
+
+    .brand strong {
+      font-weight: 700;
+      color: #3d4146;
+    }
+
+    .brand span {
+      font-weight: 400;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 4px;
+    }
+
+    .brand-mark i {
+      display: block;
+      background: #2aa8f5;
+      border-radius: 3px;
+    }
+
+    .brand-mark i:last-child {
+      background: transparent;
+      border: 4px solid #2aa8f5;
+      border-radius: 3px;
+      position: relative;
+    }
+
+    .brand-mark i:last-child::after {
+      content: "";
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      right: 1px;
+      bottom: 1px;
+      background: #2aa8f5;
+    }
+
+    .info-button {
+      width: 42px;
+      height: 42px;
+      border: 2px solid #bbc1c8;
+      border-radius: 50%;
+      background: #fff;
+      color: #77818d;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .info-button svg {
+      width: 23px;
+      height: 23px;
+    }
+
+    main {
+      padding: 28px 56px 48px;
+    }
+
+    h1 {
+      margin: 0 0 38px;
+      text-align: center;
+      font-size: clamp(34px, 4vw, 56px);
+      line-height: 1.12;
+      letter-spacing: -2.6px;
+      font-weight: 800;
+    }
+
+    h1 .blue {
+      color: var(--blue);
+    }
+
+    .generator {
+      max-width: 1430px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 34px;
+      align-items: start;
+    }
+
+    .input-card {
+      min-height: 520px;
+      background: #fff;
+      border: 1px solid #edf0f3;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(44, 56, 74, 0.05);
+      padding: 42px 38px;
+    }
+
+    .url-row {
+      display: grid;
+      grid-template-columns: 78px minmax(0, 1fr) 254px;
+      align-items: end;
+      gap: 12px;
+    }
+
+    .globe {
+      width: 64px;
+      height: 64px;
+      color: var(--blue);
+      margin-bottom: 4px;
+    }
+
+    .field {
+      min-width: 0;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      height: 54px;
+      border: 1.5px solid #46adf7;
+      border-radius: 8px;
+      padding: 0 48px 0 16px;
+      color: #111;
+      background: #fff;
+      font: 500 17px "Poppins", Arial, sans-serif;
+      outline: none;
+      box-shadow: 0 0 0 3px transparent;
+      transition: box-shadow .2s, border-color .2s;
+    }
+
+    .input-wrap input:focus {
+      box-shadow: 0 0 0 3px rgba(42, 157, 244, .12);
+    }
+
+    .valid-icon {
+      position: absolute;
+      right: 13px;
+      top: 50%;
+      width: 27px;
+      height: 27px;
+      transform: translateY(-50%);
+      color: var(--green);
+    }
+
+    .helper {
+      margin: 12px 0 0;
+      color: #7a7977;
+      font-size: 15px;
+    }
+
+    .primary-button {
+      height: 54px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #fff;
+      font: 700 17px "Poppins", Arial, sans-serif;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+
+    .primary-button:hover,
+    .download-button:hover {
+      background: #188fe9;
+    }
+
+    .primary-button:active,
+    .download-button:active {
+      transform: translateY(1px);
+    }
+
+    .preview-column {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .qr-card {
+      height: 450px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border: 1px solid #edf0f3;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(44, 56, 74, 0.05);
+      padding: 40px;
+    }
+
+    #qrcode {
+      width: 310px;
+      height: 310px;
+      display: grid;
+      place-items: center;
+    }
+
+    #qrcode canvas,
+    #qrcode img,
+    #qrcode svg {
+      width: 310px !important;
+      height: 310px !important;
+    }
+
+    .download-button {
+      height: 86px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font: 700 18px "Poppins", Arial, sans-serif;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+
+    .download-button svg {
+      width: 34px;
+      height: 34px;
+    }
+
+    .steps-section {
+      max-width: 1430px;
+      margin: 112px auto 24px;
+      padding: 68px clamp(24px, 6vw, 88px) 76px;
+      overflow: hidden;
+      border: 1px solid #edf2fb;
+      border-radius: 24px;
+      background:
+        radial-gradient(ellipse at 100% 18%, rgba(226, 244, 255, .8), transparent 38%),
+        #fff;
+    }
+
+    .steps-intro {
+      max-width: 720px;
+      margin: 0 auto 56px;
+      text-align: center;
+    }
+
+    .steps-intro h2 {
+      margin: 0;
+      color: #17243b;
+      font-size: clamp(32px, 4vw, 48px);
+      line-height: 1.14;
+      letter-spacing: -1.8px;
+      font-weight: 800;
+    }
+
+    .steps-intro p {
+      margin: 16px 0 24px;
+      color: #7a8799;
+      font-size: 16px;
+    }
+
+    .steps-cta {
+      min-height: 50px;
+      padding: 0 24px;
+      border: 0;
+      border-radius: 7px;
+      background: var(--blue);
+      color: #fff;
+      font: 700 15px "Poppins", Arial, sans-serif;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+
+    .steps-cta:hover {
+      background: #188fe9;
+    }
+
+    .steps-cta:active {
+      transform: translateY(1px);
+    }
+
+    .steps-layout {
+      display: grid;
+      grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+      gap: clamp(32px, 6vw, 86px);
+      align-items: center;
+    }
+
+    .steps-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .step-option {
+      width: 100%;
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 18px 22px;
+      border: 1px solid #e8eef8;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, .9);
+      color: #6f7e92;
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+      transition: background .2s, border-color .2s, color .2s, box-shadow .2s;
+    }
+
+    .step-option:hover {
+      border-color: #b7dafb;
+    }
+
+    .step-option.is-active {
+      border-color: transparent;
+      background: #f2f7ff;
+      color: #28364d;
+      box-shadow: 0 8px 22px rgba(48, 91, 150, .04);
+    }
+
+    .step-number {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: #edf3fd;
+      color: #6c89b5;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .step-option.is-active .step-number {
+      background: #dceaff;
+      color: var(--blue);
+    }
+
+    .step-option strong {
+      display: block;
+      font-size: 17px;
+      line-height: 1.4;
+    }
+
+    .step-description {
+      min-height: 52px;
+      margin: 18px 4px 20px;
+      color: #6f7e92;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .steps-visual {
+      min-width: 0;
+      min-height: 340px;
+      display: grid;
+      place-items: center;
+      position: relative;
+      padding: 22px;
+    }
+
+    .visual-window {
+      width: min(100%, 520px);
+      min-height: 280px;
+      position: relative;
+      padding: 22px;
+      border: 1px solid #edf1f8;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, .92);
+      box-shadow: 0 20px 55px rgba(45, 70, 110, .1);
+    }
+
+    .visual-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #f0f3f8;
+    }
+
+    .visual-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .visual-dots i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #dce4ef;
+    }
+
+    .visual-top-label {
+      color: #91a0b4;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .visual-content {
+      min-height: 194px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 140px;
+      gap: 18px;
+      align-items: center;
+      padding: 20px 6px 6px;
+    }
+
+    .visual-lines {
+      display: grid;
+      gap: 12px;
+      align-content: center;
+    }
+
+    .visual-line {
+      height: 9px;
+      border-radius: 9px;
+      background: #eef2f8;
+    }
+
+    .visual-line:nth-child(1) { width: 78%; height: 13px; background: #e4edf9; }
+    .visual-line:nth-child(2) { width: 94%; }
+    .visual-line:nth-child(3) { width: 67%; }
+
+    .visual-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 8px;
+    }
+
+    .visual-chip {
+      padding: 5px 8px;
+      border-radius: 5px;
+      background: #f2f6fc;
+      color: #718198;
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+    .mini-qr-frame {
+      width: 140px;
+      height: 140px;
+      display: grid;
+      place-items: center;
+      border: 8px solid #fff;
+      border-radius: 15px;
+      background: #fff;
+      box-shadow: 0 4px 18px rgba(25, 45, 75, .12);
+    }
+
+    #stepsQr {
+      width: 116px;
+      height: 116px;
+      display: grid;
+      place-items: center;
+    }
+
+    #stepsQr canvas,
+    #stepsQr img {
+      width: 116px !important;
+      height: 116px !important;
+    }
+
+    .visual-status {
+      position: absolute;
+      right: -14px;
+      bottom: 24px;
+      padding: 10px 15px;
+      border: 1px solid #e8eff9;
+      border-radius: 9px;
+      background: #fff;
+      color: #4a637f;
+      box-shadow: 0 8px 24px rgba(45, 70, 110, .1);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .visual-status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      display: inline-block;
+      margin-right: 7px;
+      border-radius: 50%;
+      background: #35bd78;
+      vertical-align: 1px;
+    }
+
+    .visual-caption {
+      position: absolute;
+      left: 6px;
+      bottom: -3px;
+      padding: 8px 13px;
+      border-radius: 18px;
+      background: #ddceff;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .3px;
+    }
+
+    .feature-showcase {
+      max-width: 770px;
+      margin: 112px auto 0;
+    }
+
+    .feature-showcase h2 {
+      max-width: 460px;
+      margin: 0 0 26px;
+      color: #17243b;
+      font-size: clamp(29px, 3.2vw, 36px);
+      line-height: 1.18;
+      letter-spacing: -1.2px;
+      font-weight: 800;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .feature-card {
+      min-height: 132px;
+      display: grid;
+      grid-template-columns: 25px minmax(0, 1fr);
+      gap: 11px;
+      align-content: start;
+      padding: 16px 13px;
+      border: 1px solid #e8eef8;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, .92);
+    }
+
+    .feature-icon {
+      width: 25px;
+      height: 25px;
+      color: var(--blue);
+    }
+
+    .feature-card h3 {
+      margin: 0 0 8px;
+      color: #25334a;
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .feature-card p {
+      margin: 0;
+      color: #7a8799;
+      font-size: 10px;
+      line-height: 1.55;
+    }
+
+    .feature-banner {
+      min-height: 168px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(190px, .75fr);
+      align-items: center;
+      gap: 20px;
+      margin-top: 100px;
+      padding: 24px 36px;
+      overflow: hidden;
+      border-radius: 9px;
+      background: #169fe5;
+      color: #fff;
+    }
+
+    .feature-banner h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .feature-banner p {
+      max-width: 350px;
+      margin: 0 0 14px;
+      color: rgba(255, 255, 255, .9);
+      font-size: 10px;
+      line-height: 1.65;
+    }
+
+    .feature-banner button {
+      min-height: 36px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 5px;
+      background: #fff;
+      color: #168fd1;
+      font: 700 11px "Poppins", Arial, sans-serif;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+
+    .feature-banner button:hover {
+      background: #eaf7ff;
+    }
+
+    .feature-banner button:active {
+      transform: translateY(1px);
+    }
+
+    .feature-art {
+      min-height: 120px;
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    .feature-qr-frame {
+      width: 104px;
+      height: 104px;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      border: 7px solid #fff;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 5px 16px rgba(0, 64, 112, .2);
+    }
+
+    #featureQr {
+      width: 90px;
+      height: 90px;
+      display: grid;
+      place-items: center;
+    }
+
+    #featureQr canvas,
+    #featureQr img {
+      width: 90px !important;
+      height: 90px !important;
+    }
+
+    .feature-link-bubble,
+    .feature-type-bubble {
+      position: absolute;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      border: 3px solid #bce7ff;
+      border-radius: 50%;
+      background: #fff;
+      color: #168fd1;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .feature-link-bubble {
+      top: 42px;
+      left: calc(50% + 28px);
+      width: 38px;
+      height: 38px;
+    }
+
+    .feature-type-bubble {
+      width: 27px;
+      height: 27px;
+      border-width: 2px;
+      font-size: 8px;
+    }
+
+    .feature-type-bubble.one {
+      top: 7px;
+      right: 12%;
+    }
+
+    .feature-type-bubble.two {
+      right: 3%;
+      bottom: 20px;
+    }
+
+    .feature-type-bubble.three {
+      top: 50%;
+      right: 1%;
+      transform: translateY(-50%);
+    }
+
+    @media (max-width: 980px) {
+      .topbar {
+        padding: 0 24px;
+      }
+
+      main {
+        padding: 24px;
+      }
+
+      h1 {
+        margin-bottom: 28px;
+      }
+
+      .generator {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-column {
+        max-width: 390px;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      .input-card {
+        min-height: auto;
+      }
+
+      .steps-section {
+        margin-top: 80px;
+        padding: 52px 32px 58px;
+      }
+
+      .steps-layout {
+        max-width: 660px;
+        grid-template-columns: 1fr;
+        gap: 24px;
+        margin: 0 auto;
+      }
+
+      .steps-visual {
+        min-height: 320px;
+      }
+
+      .feature-showcase {
+        max-width: 660px;
+        margin-top: 80px;
+      }
+
+      .feature-banner {
+        margin-top: 72px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .topbar {
+        height: 76px;
+        padding: 0 18px;
+      }
+
+      .brand {
+        font-size: 29px;
+      }
+
+      .brand-mark {
+        width: 31px;
+        height: 31px;
+      }
+
+      .info-button {
+        width: 38px;
+        height: 38px;
+      }
+
+      main {
+        padding: 22px 14px 36px;
+      }
+
+      h1 {
+        font-size: 34px;
+        letter-spacing: -1.5px;
+      }
+
+      .input-card {
+        padding: 24px 16px;
+      }
+
+      .url-row {
+        grid-template-columns: 54px minmax(0, 1fr);
+        align-items: end;
+      }
+
+      .globe {
+        width: 48px;
+        height: 48px;
+      }
+
+      .primary-button {
+        grid-column: 1 / -1;
+        margin-top: 6px;
+      }
+
+      .qr-card {
+        height: 390px;
+        padding: 24px;
+      }
+
+      .steps-section {
+        margin-top: 58px;
+        padding: 42px 18px 34px;
+        border-radius: 16px;
+      }
+
+      .feature-showcase {
+        margin-top: 64px;
+      }
+
+      .feature-showcase h2 {
+        font-size: 29px;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+        gap: 9px;
+      }
+
+      .feature-card {
+        min-height: 0;
+        padding: 15px;
+      }
+
+      .feature-card h3 {
+        font-size: 14px;
+      }
+
+      .feature-card p {
+        font-size: 12px;
+      }
+
+      .feature-banner {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        margin-top: 48px;
+        padding: 24px;
+      }
+
+      .feature-banner p {
+        font-size: 12px;
+      }
+
+      .feature-art {
+        min-height: 128px;
+      }
+
+      .feature-type-bubble.one {
+        right: 19%;
+      }
+
+      .feature-type-bubble.two {
+        right: 12%;
+      }
+
+      .feature-type-bubble.three {
+        right: 10%;
+      }
+
+      #featureQr,
+      #featureQr canvas,
+      #featureQr img {
+        width: 90px !important;
+        height: 90px !important;
+      }
+
+      .steps-intro {
+        margin-bottom: 34px;
+      }
+
+      .steps-intro h2 {
+        font-size: 31px;
+        letter-spacing: -1px;
+      }
+
+      .steps-intro p {
+        font-size: 14px;
+      }
+
+      .step-option {
+        min-height: 68px;
+        gap: 12px;
+        padding: 14px;
+      }
+
+      .step-option strong {
+        font-size: 15px;
+      }
+
+      .steps-visual {
+        min-height: 270px;
+        padding: 12px 8px;
+      }
+
+      .visual-window {
+        min-height: 240px;
+        padding: 15px;
+      }
+
+      .visual-content {
+        min-height: 170px;
+        grid-template-columns: minmax(0, 1fr) 110px;
+        gap: 12px;
+        padding: 16px 0 4px;
+      }
+
+      .mini-qr-frame {
+        width: 110px;
+        height: 110px;
+        border-width: 6px;
+      }
+
+      #stepsQr,
+      #stepsQr canvas,
+      #stepsQr img {
+        width: 92px !important;
+        height: 92px !important;
+      }
+
+      .visual-status {
+        right: -4px;
+        bottom: 10px;
+      }
+
+      .visual-caption {
+        left: 0;
+        bottom: -12px;
+      }
+
+      #qrcode,
+      #qrcode canvas,
+      #qrcode img,
+      #qrcode svg {
+        width: 280px !important;
+        height: 280px !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand" aria-label="QR code.io">
+      <div class="brand-mark" aria-hidden="true">
+        <i></i><i></i><i></i><i></i>
+      </div>
+      <div><strong>QR</strong> <span>code.io</span></div>
+    </div>
+    <button class="info-button" type="button" aria-label="Information">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M12 10.8v6"></path>
+        <circle cx="12" cy="7.7" r=".8" fill="currentColor" stroke="none"></circle>
+      </svg>
+    </button>
+  </header>
+
+  <main>
+    <h1><span class="blue">Easily create a QR code</span> for any occasion in seconds!</h1>
+
+    <section class="generator" aria-label="QR code generator">
+      <div class="input-card">
+        <div class="url-row">
+          <svg class="globe" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4">
+            <circle cx="32" cy="32" r="25"></circle>
+            <path d="M7 32h50M32 7c8 8 11 16 11 25S40 49 32 57M32 7c-8 8-11 16-11 25s3 17 11 25"></path>
+          </svg>
+          <div class="field">
+            <label for="urlInput">Enter or paste URL</label>
+            <div class="input-wrap">
+              <input id="urlInput" type="text" value="www.google.com" spellcheck="false" autocomplete="off">
+              <svg class="valid-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M7.5 12.3l3 3 6-6.5"></path>
+              </svg>
+            </div>
+          </div>
+          <button class="primary-button" id="generateButton" type="button">Generate QR Code</button>
+        </div>
+        <p class="helper">Your QR code will open this URL</p>
+      </div>
+
+      <div class="preview-column">
+        <div class="qr-card">
+          <div id="qrcode" aria-label="Generated QR code"></div>
+        </div>
+        <button class="download-button" id="downloadButton" type="button">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="16" cy="16" r="13"></circle>
+            <path d="M16 7v14M10 15l6 6 6-6M8 24h16"></path>
+          </svg>
+          <span>Download QR Code</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="steps-section" aria-labelledby="stepsTitle">
+      <div class="steps-intro">
+        <h2 id="stepsTitle">Create a QR Code in Just a Few Steps</h2>
+        <p>Enter a link, preview your code, then download and share it.</p>
+        <button class="steps-cta" id="stepsCta" type="button">Generate QR Code</button>
+      </div>
+
+      <div class="steps-layout">
+        <div class="steps-copy">
+          <div class="steps-list" role="group" aria-label="QR code creation steps">
+            <button class="step-option is-active" type="button" aria-pressed="true" data-step="0">
+              <span class="step-number">01</span>
+              <strong>Enter your website URL</strong>
+            </button>
+            <button class="step-option" type="button" aria-pressed="false" data-step="1">
+              <span class="step-number">02</span>
+              <strong>Preview your QR code</strong>
+            </button>
+            <button class="step-option" type="button" aria-pressed="false" data-step="2">
+              <span class="step-number">03</span>
+              <strong>Download and share</strong>
+            </button>
+          </div>
+          <p class="step-description" id="stepDescription" aria-live="polite">
+            Paste a web address in the field above. The QR code updates as you enter a valid link.
+          </p>
+        </div>
+
+        <div class="steps-visual" aria-label="Illustration of a QR code preview">
+          <div class="visual-window">
+            <div class="visual-topbar">
+              <span class="visual-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="visual-top-label" id="visualTitle">YOUR QR PREVIEW</span>
+            </div>
+            <div class="visual-content">
+              <div class="visual-lines" aria-hidden="true">
+                <span class="visual-line"></span>
+                <span class="visual-line"></span>
+                <span class="visual-line"></span>
+                <span class="visual-chip-row">
+                  <span class="visual-chip">WEBSITE</span>
+                  <span class="visual-chip">SHARE</span>
+                </span>
+              </div>
+              <div class="mini-qr-frame">
+                <div id="stepsQr" aria-label="Small QR code preview"></div>
+              </div>
+            </div>
+            <span class="visual-status" id="visualStatus">Ready to scan</span>
+          </div>
+          <span class="visual-caption" id="visualCaption">QR PREVIEW</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="feature-showcase" aria-labelledby="featureTitle">
+      <h2 id="featureTitle">An Easy-to-Use QR Code Generator</h2>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+            <path d="M14 14h3v3h-3zM20 14v2M14 20h2M19 19h2v2h-2z"></path>
+          </svg>
+          <div>
+            <h3>Create a URL QR code</h3>
+            <p>Turn a website address into a QR code that people can scan with a phone.</p>
+          </div>
+        </article>
+        <article class="feature-card">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6.5"></circle>
+            <path d="m15.5 15.5 5 5M7.5 10.5l2 2 4-4"></path>
+          </svg>
+          <div>
+            <h3>Preview as you type</h3>
+            <p>See the generated QR code and check your destination before downloading.</p>
+          </div>
+        </article>
+        <article class="feature-card">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"></path>
+          </svg>
+          <div>
+            <h3>Download as a PNG</h3>
+            <p>Save your QR code image and use it on web pages or printed materials.</p>
+          </div>
+        </article>
+        <article class="feature-card">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <circle cx="6" cy="12" r="2.5"></circle>
+            <circle cx="18" cy="6" r="2.5"></circle>
+            <circle cx="18" cy="18" r="2.5"></circle>
+            <path d="m8.3 10.9 7.4-3.8M8.3 13.1l7.4 3.8"></path>
+          </svg>
+          <div>
+            <h3>Share it anywhere</h3>
+            <p>Add the downloaded image to a menu, poster, business card, or website.</p>
+          </div>
+        </article>
+        <article class="feature-card">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <rect x="6" y="2.5" width="12" height="19" rx="2"></rect>
+            <path d="M10 5h4M10 18.5h4"></path>
+          </svg>
+          <div>
+            <h3>Works on mobile</h3>
+            <p>Create and download a QR code from your phone, tablet, or computer.</p>
+          </div>
+        </article>
+        <article class="feature-card">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M10 13.5a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.7 1.7"></path>
+            <path d="M14 10.5a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 19.2l1.7-1.7"></path>
+          </svg>
+          <div>
+            <h3>Use your own link</h3>
+            <p>Paste a URL or domain name and the page prepares it for QR generation.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="feature-banner">
+        <div class="feature-banner-copy">
+          <h3>Create your QR code today</h3>
+          <p>Make a scannable code for your website, download it as an image, and share it wherever people need your link.</p>
+          <button id="featureCta" type="button">Create QR Code</button>
+        </div>
+        <div class="feature-art" aria-label="QR code sharing illustration">
+          <div class="feature-qr-frame">
+            <div id="featureQr" aria-label="QR code preview"></div>
+          </div>
+          <span class="feature-link-bubble" aria-hidden="true">&gt;</span>
+          <span class="feature-type-bubble one" aria-hidden="true">W</span>
+          <span class="feature-type-bubble two" aria-hidden="true">S</span>
+          <span class="feature-type-bubble three" aria-hidden="true">+</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script>
+    const input = document.getElementById("urlInput");
+    const qrContainer = document.getElementById("qrcode");
+    const generateButton = document.getElementById("generateButton");
+    const downloadButton = document.getElementById("downloadButton");
+    const stepsQrContainer = document.getElementById("stepsQr");
+    const featureQrContainer = document.getElementById("featureQr");
+    let qr = null;
+
+    const stepContent = [
+      {
+        description: "Paste a web address in the field above. The QR code updates as you enter a valid link.",
+        title: "YOUR QR PREVIEW",
+        status: "Ready to scan",
+        caption: "QR PREVIEW"
+      },
+      {
+        description: "Check the preview to make sure your code is clear and points to the right destination.",
+        title: "CHECK YOUR CODE",
+        status: "Preview ready",
+        caption: "CHECK PREVIEW"
+      },
+      {
+        description: "Download the QR image, then add it to a page, poster, menu, or other materials.",
+        title: "READY TO SHARE",
+        status: "Download ready",
+        caption: "SAVE & SHARE"
+      }
+    ];
+
+    function normalizeUrl(value) {
+      let url = value.trim();
+      if (!url) return "";
+      if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+      return url;
+    }
+
+    function generateQr() {
+      const url = normalizeUrl(input.value);
+      if (!url) {
+        input.focus();
+        return;
+      }
+
+      qrContainer.innerHTML = "";
+      qr = new QRCode(qrContainer, {
+        text: url,
+        width: 310,
+        height: 310,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+      stepsQrContainer.innerHTML = "";
+      new QRCode(stepsQrContainer, {
+        text: url,
+        width: 116,
+        height: 116,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+      featureQrContainer.innerHTML = "";
+      new QRCode(featureQrContainer, {
+        text: url,
+        width: 90,
+        height: 90,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+
+    function selectStep(index) {
+      const step = stepContent[index];
+      document.querySelectorAll(".step-option").forEach((button, buttonIndex) => {
+        const isActive = buttonIndex === index;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+      document.getElementById("stepDescription").textContent = step.description;
+      document.getElementById("visualTitle").textContent = step.title;
+      document.getElementById("visualStatus").textContent = step.status;
+      document.getElementById("visualCaption").textContent = step.caption;
+    }
+
+    async function downloadQr() {
+      const canvas = qrContainer.querySelector("canvas");
+      const image = qrContainer.querySelector("img");
+      const source = canvas || image;
+      if (!source) return;
+
+      const download = document.createElement("a");
+      if (canvas) {
+        download.href = canvas.toDataURL("image/png");
+      } else {
+        download.href = source.src;
+      }
+      download.download = "qr-code.png";
+      document.body.appendChild(download);
+      download.click();
+      download.remove();
+
+      downloadButton.disabled = true;
+      try {
+        const response = await fetch("sendmail.php", { method: "POST" });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || "The email notification could not be sent.");
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "The email notification could not be sent.";
+        // alert("The QR was downloaded, but the email notification failed: " + message);
+      } finally {
+        downloadButton.disabled = false;
+      }
+    }
+
+    generateButton.addEventListener("click", generateQr);
+    downloadButton.addEventListener("click", downloadQr);
+    document.querySelectorAll(".step-option").forEach((button, index) => {
+      button.addEventListener("click", () => selectStep(index));
+    });
+    document.getElementById("stepsCta").addEventListener("click", () => {
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+      input.focus({ preventScroll: true });
+    });
+    document.getElementById("featureCta").addEventListener("click", () => {
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+      input.focus({ preventScroll: true });
+    });
+    input.addEventListener("keydown", event => {
+      if (event.key === "Enter") generateQr();
+    });
+    input.addEventListener("input", () => {
+      clearTimeout(input.generateTimer);
+      input.generateTimer = setTimeout(generateQr, 350);
+    });
+
+    generateQr();
+  </script>
+</body>
+
+</html>
